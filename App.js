@@ -91,14 +91,23 @@ async function query() {
 }
 
 async function queryDB() {
-  let times = [];
+  let times = { load: [], access: [] };
   for (let i = 0; i < 10; i++) {
     performance.mark("queryStart");
-    await query();
+    const result = await query();
     let measurement = performance.measure("queryEnd", "queryStart");
     console.warn(`query ${i} done`);
 
-    times.push(measurement.duration);
+    times.load.push(measurement.duration);
+
+    console.warn(result[0].rows.length);
+
+    performance.mark("accessStart");
+    for (let j = 0; j < result[0].rows.length; j++) {
+      const v14 = result[0].rows[j].v14;
+    }
+    let accessMeasurement = performance.measure("accessEnd", "accessStart");
+    times.access.push(accessMeasurement.duration);
   }
 
   return times;
@@ -106,7 +115,7 @@ async function queryDB() {
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [times, setTimes] = useState([]);
+  const [times, setTimes] = useState({ load: [], access: [] });
 
   const createDb = async () => {
     try {
@@ -144,13 +153,22 @@ export default function App() {
       <Button title="Create DB" onPress={createDb} />
       <Button title="Query DB" onPress={queryDb} />
       {isLoading && <ActivityIndicator color="white" />}
-      {times.map((t) => {
-        return <Text style={styles.normal}>{t.toFixed(0)}ms</Text>;
-      })}
 
-      {!!times.length && (
+      {!!times.load.length && (
         <Text style={styles.big}>
-          {(times.reduce((acc, t) => (acc += t), 0) / times.length).toFixed(0)}{" "}
+          Load{" "}
+          {(
+            times.load.reduce((acc, t) => (acc += t), 0) / times.load.length
+          ).toFixed(0)}{" "}
+          ms average
+        </Text>
+      )}
+      {!!times.access.length && (
+        <Text style={styles.big}>
+          Access{" "}
+          {(
+            times.access.reduce((acc, t) => (acc += t), 0) / times.access.length
+          ).toFixed(0)}{" "}
           ms average
         </Text>
       )}

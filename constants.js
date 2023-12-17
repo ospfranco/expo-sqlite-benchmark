@@ -1,0 +1,1 @@
+export const SMALL_QUERY = "SELECT * FROM Test LIMIT 200";

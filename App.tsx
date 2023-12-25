@@ -13,30 +13,32 @@ import performance from "react-native-performance";
 
 const chance = new Chance();
 
-const STEP = 10000
+const STEP = 10000;
 
 const db = SQLite.openDatabaseSync("db.testDb");
 
 async function addData(j) {
   for (let i = j * STEP; i < j * STEP + STEP; i++) {
-  await db.runAsync('INSERT INTO "Test" (id, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-  i,
-              chance.name(),
-              chance.name(),
-              chance.name(),
-              chance.name(),
-              chance.name(),
-              chance.integer(),
-              chance.integer(),
-              chance.integer(),
-              chance.integer(),
-              chance.integer(),
-              chance.floating(),
-              chance.floating(),
-              chance.floating(),
-              chance.floating())
+    await db.runAsync(
+      'INSERT INTO "Test" (id, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      i,
+      chance.name(),
+      chance.name(),
+      chance.name(),
+      chance.name(),
+      chance.name(),
+      chance.integer(),
+      chance.integer(),
+      chance.integer(),
+      chance.integer(),
+      chance.integer(),
+      chance.floating(),
+      chance.floating(),
+      chance.floating(),
+      chance.floating()
+    );
   }
-  global.gc()
+  global.gc();
   console.warn(`data added ${j * STEP} to ${j * STEP + STEP}`);
   // return new Promise<void>((resolve, reject) => {
   //   db.runSync(
@@ -76,8 +78,10 @@ async function addData(j) {
 }
 
 async function createDB() {
-  await db.runAsync('DROP TABLE IF EXISTS Test;')
-  await db.runAsync("CREATE TABLE Test ( id INT PRIMARY KEY, v1 TEXT, v2 TEXT, v3 TEXT, v4 TEXT, v5 TEXT, v6 INT, v7 INT, v8 INT, v9 INT, v10 INT, v11 REAL, v12 REAL, v13 REAL, v14 REAL)")
+  await db.runAsync("DROP TABLE IF EXISTS Test;");
+  await db.runAsync(
+    "CREATE TABLE Test ( id INT PRIMARY KEY, v1 TEXT, v2 TEXT, v3 TEXT, v4 TEXT, v5 TEXT, v6 INT, v7 INT, v8 INT, v9 INT, v10 INT, v11 REAL, v12 REAL, v13 REAL, v14 REAL)"
+  );
   // return new Promise<void>((resolve, reject) => {
   //   db.transaction(
   //     (tx) => {
@@ -99,7 +103,7 @@ async function createDB() {
 }
 
 async function query() {
-  await db.getAllAsync("SELECT * FROM Test")
+  await db.getAllAsync("SELECT * FROM Test LIMIT 1;");
   // return new Promise((resolve, reject) => {
   //   db.exec(
   //     [{ sql: "SELECT * FROM Test", args: [] }],
@@ -119,7 +123,7 @@ async function queryDB() {
   let times = { load: [], access: [] };
   for (let i = 0; i < 10; i++) {
     let start = performance.now();
-    const result = await db.getAllAsync("SELECT * FROM Test");
+    const result = await db.getAllAsync("SELECT * FROM Test LIMIT 1;");
     let end = performance.now();
     console.warn(`query ${i + 1} time ${(end - start).toFixed(2)}`);
 
